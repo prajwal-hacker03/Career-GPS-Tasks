@@ -1,0 +1,3572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Career GPS — Premium AI-powered engineering career roadmap generator. Map your semester-wise skills, projects, internships, and placements.">
+    <title>Career GPS | Your Engineering Career, Mapped.</title>
+    
+    <!-- Google Fonts: Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* CSS RESET & VARIABLES */
+        :root {
+            --bg-color: #0A0A0F;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-glow-border: rgba(79, 142, 247, 0.25);
+            --primary-accent: #4F8EF7;
+            --secondary-accent: #7C3AED;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --gradient-accent: linear-gradient(135deg, var(--primary-accent) 0%, var(--secondary-accent) 100%);
+            --font-family: 'Space Grotesk', sans-serif;
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* BACKGROUND EFFECTS */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .aurora-bg {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            mix-blend-mode: screen;
+            animation: aurora-move 20s infinite alternate ease-in-out;
+        }
+
+        .blob-1 {
+            background: var(--primary-accent);
+            top: -200px;
+            left: -200px;
+            animation-duration: 25s;
+        }
+
+        .blob-2 {
+            background: var(--secondary-accent);
+            bottom: -200px;
+            right: -200px;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            background: #4F8EF7;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            opacity: 0.08;
+            animation-duration: 35s;
+            animation-delay: -10s;
+        }
+
+        @keyframes aurora-move {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(100px, 80px) scale(1.1) rotate(180deg); }
+            100% { transform: translate(-80px, -100px) scale(0.9) rotate(360deg); }
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #06060A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gradient-accent);
+        }
+
+        /* NAVIGATION */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.25rem 2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            -webkit-text-fill-color: var(--primary-accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-accent);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-btn {
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .badge-floating {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-accent);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 70%, #4F8EF7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-glow 5s infinite alternate;
+        }
+
+        .hero p.subtitle {
+            font-size: 1.35rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border: none;
+            padding: 1rem 2.25rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-family);
+            box-shadow: 0 4px 20px rgba(79, 142, 247, 0.3);
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(79, 142, 247, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 1rem 2.25rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-family);
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* STATS SECTION */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--card-glow-border) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* HOW IT WORKS SECTION */
+        .section-padding {
+            padding: 8rem 2rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 60%, var(--primary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+        }
+
+        .how-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            backdrop-filter: blur(12px);
+            position: relative;
+            transition: var(--transition-smooth);
+            overflow: hidden;
+        }
+
+        .how-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--card-glow-border) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .how-card:hover::before {
+            opacity: 1;
+        }
+
+        .how-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .how-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.75rem;
+            color: var(--primary-accent);
+            margin-bottom: 2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .how-card:hover .how-icon-wrapper {
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .how-step {
+            position: absolute;
+            top: 2rem;
+            right: 2.5rem;
+            font-size: 4rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.02);
+            line-height: 1;
+            transition: var(--transition-smooth);
+        }
+
+        .how-card:hover .how-step {
+            color: rgba(255, 255, 255, 0.05);
+            transform: scale(1.1);
+        }
+
+        .how-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .how-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .how-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .how-tag {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 0.35rem 0.85rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* SURVEY / ROADMAP GENERATOR FORM */
+        .survey-section {
+            background: relative;
+            padding: 6rem 2rem;
+        }
+
+        .survey-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3.5rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 3.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 33.33%;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-step h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-step p.step-desc {
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
+        }
+
+        .form-group {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* GRID/SELECTION OPTIONS */
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-card i {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            transition: var(--transition-smooth);
+        }
+
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .option-card.selected {
+            background: rgba(79, 142, 247, 0.08);
+            border-color: var(--primary-accent);
+            color: var(--text-primary);
+            box-shadow: 0 0 15px rgba(79, 142, 247, 0.2);
+        }
+
+        .option-card.selected i {
+            color: var(--primary-accent);
+        }
+
+        /* SLIDER CUSTOMIZATION */
+        .slider-wrapper {
+            position: relative;
+            margin-top: 1.5rem;
+        }
+
+        .slider-wrapper input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .slider-wrapper input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .slider-wrapper input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -2.25rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-accent);
+        }
+
+        /* CHIPS CONTAINER */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            user-select: none;
+        }
+
+        .chip:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .chip.selected {
+            background: var(--gradient-accent);
+            border-color: transparent;
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        /* FORM INPUT FIELDS */
+        .select-field, .text-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            font-family: var(--font-family);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .select-field:focus, .text-field:focus {
+            border-color: var(--primary-accent);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 15px rgba(79, 142, 247, 0.15);
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .input-icon-wrapper .text-field {
+            padding-left: 3rem;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* FORM NAVIGATION BUTTONS */
+        .form-nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3.5rem;
+            gap: 1.5rem;
+        }
+
+        .btn-form-prev {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 0.9rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-family);
+            transition: var(--transition-smooth);
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-form-prev:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-form-next, .btn-form-submit {
+            background: var(--gradient-accent);
+            border: none;
+            color: var(--text-primary);
+            padding: 0.9rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-family);
+            transition: var(--transition-smooth);
+            flex: 1.5;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-form-next:hover, .btn-form-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+        }
+
+        /* LOADING SCANNER SCREEN */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loading-scanner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: spin 8s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-scanner-bar {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-accent);
+            top: 50%;
+            left: 0;
+            box-shadow: 0 0 15px var(--primary-accent);
+            animation: scan 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes scan {
+            0% { top: 10%; }
+            100% { top: 90%; }
+        }
+
+        .loading-icon {
+            font-size: 2.5rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .loading-status {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            min-height: 1.8rem;
+        }
+
+        .loading-substatus {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* DASHBOARD SECTION */
+        .dashboard-section {
+            padding: 8rem 2rem 4rem;
+            max-width: 1350px;
+            margin: 0 auto;
+            display: none;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+            gap: 2rem;
+        }
+
+        .dashboard-title-area h2 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(79, 142, 247, 0.08);
+            border: 1px solid rgba(79, 142, 247, 0.2);
+            color: var(--primary-accent);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-control {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-control:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-control-accent {
+            background: var(--gradient-accent);
+            border: none;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
+        }
+
+        .btn-control-accent:hover {
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        /* METRICS PANELS GRID */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .metric-icon-box {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: var(--primary-accent);
+        }
+
+        .metric-panel:nth-child(2) .metric-icon-box { color: var(--success); }
+        .metric-panel:nth-child(3) .metric-icon-box { color: var(--warning); }
+        .metric-panel:nth-child(4) .metric-icon-box { color: #EC4899; }
+
+        .metric-details h4 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-details p {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* TWO COLUMN ANALYSIS LAYOUT */
+        .analysis-layout {
+            display: grid;
+            grid-template-columns: 2.2fr 1.8fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .analysis-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .analysis-box h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .analysis-box h3 i {
+            color: var(--primary-accent);
+        }
+
+        /* CAREER MATCH SCORES (CIRCULAR PROGRESS) */
+        .scores-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .score-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .circle-progress-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle-progress-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 3.5;
+        }
+
+        .circle-fill {
+            fill: none;
+            stroke-width: 3.5;
+            stroke-linecap: round;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 220;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-text {
+            position: absolute;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .score-info h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .score-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* SKILL GAP ANALYSIS */
+        .skill-gap-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .gap-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .gap-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .gap-status-label {
+            font-size: 0.8rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .gap-status-acquired {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+        }
+
+        .gap-status-missing {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--error);
+        }
+
+        .gap-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .gap-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .gap-item-recommendation {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .gap-item-recommendation i {
+            color: var(--primary-accent);
+        }
+
+        /* Dynamic estimated learning time */
+        .gap-time-est {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* TIMELINE SECTION */
+        .timeline-section {
+            margin-bottom: 4rem;
+        }
+
+        .timeline-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .timeline-title i {
+            color: var(--primary-accent);
+        }
+
+        .timeline-container {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary-accent) 0%, var(--secondary-accent) 70%, rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        .timeline-node {
+            position: relative;
+            margin-bottom: 3.5rem;
+            animation: fadeUpReveal 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .timeline-node:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes fadeUpReveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timeline-indicator {
+            position: absolute;
+            left: -3rem;
+            top: 6px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 2px solid var(--primary-accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            transition: var(--transition-smooth);
+        }
+
+        .timeline-node:hover .timeline-indicator {
+            background: var(--gradient-accent);
+            border-color: transparent;
+            box-shadow: 0 0 12px var(--secondary-accent);
+            transform: scale(1.15);
+        }
+
+        .timeline-indicator::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-primary);
+        }
+
+        .timeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.25rem;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .timeline-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateX(5px);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-header h4 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .timeline-sem-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 0.35rem 0.85rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+        }
+
+        .timeline-grid-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .timeline-detail-group h5 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .timeline-detail-group h5 i {
+            color: var(--primary-accent);
+            font-size: 0.9rem;
+        }
+
+        .timeline-detail-group p {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .timeline-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .timeline-chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        /* INTERNSHIP & COURSES & ELIGIBILITY SECTIONS */
+        .bottom-sections-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 2.2fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .bottom-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .bottom-box h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .bottom-box h3 i {
+            color: var(--primary-accent);
+        }
+
+        /* PLACEMENT DASHBOARD */
+        .readiness-progress-wrapper {
+            margin-bottom: 2rem;
+        }
+
+        .readiness-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .readiness-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .readiness-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--primary-accent), var(--success));
+            border-radius: 5px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .placement-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .checklist-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .checklist-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid var(--text-secondary);
+            outline: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition-smooth);
+        }
+
+        .checklist-item input[type="checkbox"]:checked {
+            border-color: var(--success);
+            background: var(--success);
+        }
+
+        .checklist-item input[type="checkbox"]:checked::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--bg-color);
+            font-size: 0.75rem;
+        }
+
+        .checklist-info h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+
+        .checklist-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* COMPANY ELIGIBILITY */
+        .eligibility-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .eligibility-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-smooth);
+        }
+
+        .eligibility-company {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .eligibility-company i {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            width: 25px;
+            text-align: center;
+        }
+
+        .eligibility-company h5 {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .eligibility-badge-pill {
+            padding: 0.35rem 0.85rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .eligibility-badge-pill.eligible {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .eligibility-badge-pill.almost {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .eligibility-badge-pill.need-prep {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* RECOMMENDED COURSES */
+        .courses-section {
+            margin-bottom: 4rem;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .course-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transform: translateY(-4px);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .course-platform {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary-accent);
+            background: rgba(79, 142, 247, 0.08);
+            padding: 0.25rem 0.65rem;
+            border-radius: 4px;
+        }
+
+        .course-rating {
+            font-size: 0.85rem;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .course-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .course-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* INTERNSHIP DETAILS SECTION */
+        .internship-section-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+            margin-bottom: 4rem;
+        }
+
+        .internship-section-box h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .internship-section-box h3 i {
+            color: var(--primary-accent);
+        }
+
+        .internship-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .internship-checklist-column h4 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .internship-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .internship-item {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .internship-item i {
+            color: var(--success);
+            margin-top: 0.25rem;
+        }
+
+        .internship-platforms {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .platform-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition-smooth);
+        }
+
+        .platform-box:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(4px);
+        }
+
+        .platform-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+
+        .platform-title i {
+            font-size: 1.25rem;
+            color: var(--primary-accent);
+        }
+
+        .platform-box span.arrow-btn {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        /* TESTIMONIALS SECTION */
+        .testimonials {
+            background: relative;
+            padding: 6rem 2rem;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .testimonial-stars {
+            color: var(--warning);
+            margin-bottom: 1.25rem;
+        }
+
+        .testimonial-card p {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .testimonial-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .user-info h5 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+            font-style: normal;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #050508;
+            border-top: 1px solid var(--card-border);
+            padding: 5rem 2rem 2.5rem;
+        }
+
+        .footer-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-logo-area p {
+            color: var(--text-secondary);
+            margin-top: 1.25rem;
+            font-size: 0.95rem;
+            max-width: 320px;
+        }
+
+        .footer-links-column h5 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .footer-links-column ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-links-column a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links-column a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-social-icons a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-secondary);
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .footer-social-icons a:hover {
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(124,58,237,0.3);
+        }
+
+        .footer-bottom {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                color: #000000 !important;
+                font-family: sans-serif !important;
+            }
+
+            nav, footer, .hero, .how-grid, .section-header, .survey-section, .testimonials, .dashboard-controls, #particle-canvas, .aurora-bg, .course-card:hover {
+                display: none !important;
+            }
+
+            .dashboard-section {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .dashboard-header h2 {
+                color: #000000 !important;
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+            }
+
+            .metric-panel, .analysis-box, .timeline-card, .bottom-box, .course-card {
+                background: #FFFFFF !important;
+                border: 1px solid #DDDDDD !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+
+            .timeline-card h4, .timeline-indicator, .score-info h4 {
+                color: #000000 !important;
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+            }
+
+            .timeline-container::before {
+                background: #DDDDDD !important;
+            }
+
+            .circle-bg {
+                stroke: #EEEEEE !important;
+            }
+
+            .circle-fill {
+                stroke: #000000 !important;
+            }
+        }
+
+        /* RESPONSIVENESS */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 3.5rem; }
+            .how-grid { grid-template-columns: 1fr; }
+            .analysis-layout { grid-template-columns: 1fr; }
+            .bottom-sections-grid { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .courses-grid { grid-template-columns: repeat(2, 1fr); }
+            .testimonials-grid { grid-template-columns: 1fr; }
+            .footer-container { grid-template-columns: 1fr 1fr; gap: 2rem; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(10, 10, 15, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                border-bottom: 1px solid var(--card-border);
+                gap: 1.5rem;
+            }
+
+            .nav-links.active { display: flex; }
+            .menu-toggle { display: block; }
+            .hero h1 { font-size: 2.75rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .option-grid { grid-template-columns: repeat(2, 1fr); }
+            .survey-container { padding: 2rem; }
+            .timeline-grid { grid-template-columns: 1fr; }
+            .courses-grid { grid-template-columns: 1fr; }
+            .internship-grid { grid-template-columns: 1fr; }
+            .dashboard-header { flex-direction: column; align-items: stretch; }
+            .dashboard-controls { margin-top: 1rem; flex-wrap: wrap; }
+            .footer-container { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .option-grid { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Aurora Background Blobs -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
+    <!-- Sticky Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="logo">
+                <i class="fa-solid fa-compass-drafting"></i> Career GPS
+            </a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#hero" class="active">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#survey-form" id="nav-roadmap-link">Roadmap</a></li>
+                <li><a href="#footer">Contact</a></li>
+            </ul>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="nav-btn" onclick="scrollToSurvey()">
+                    Generate Roadmap <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div class="menu-toggle" id="menu-toggle">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="badge-floating">
+            <i class="fa-solid fa-sparkles"></i> AI-Powered Roadmap Generator
+        </div>
+        <h1>Your Engineering<br>Career, Mapped.</h1>
+        <p class="subtitle">Answer a few strategic questions about your engineering targets and build a highly customized, semester-by-semester milestone roadmap designed for placements and success.</p>
+        
+        <div class="cta-group">
+            <button class="btn-primary" onclick="scrollToSurvey()">
+                Build My Roadmap <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('how-it-works').scrollIntoView();">
+                Learn More
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-target="10000">0</div><span class="stat-number">+</span>
+                <div class="stat-label">Students Guided</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-target="50">0</div><span class="stat-number">+</span>
+                <div class="stat-label">Career Paths</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-target="95">0</div><span class="stat-number">%</span>
+                <div class="stat-label">Placement Success</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="section-padding" id="how-it-works">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>A rigorous, data-driven algorithm built to analyze your potential and lay out your exact career path.</p>
+        </div>
+        <div class="how-grid">
+            <div class="how-card">
+                <div class="how-step">01</div>
+                <div class="how-icon-wrapper">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h3>Tell Us About Yourself</h3>
+                <p>Provide details on your current academic branch, CGPA standings, existing programming skills, and core engineering projects.</p>
+                <div class="how-tags">
+                    <span class="how-tag">Branch</span>
+                    <span class="how-tag">CGPA</span>
+                    <span class="how-tag">Skills</span>
+                </div>
+            </div>
+            <div class="how-card">
+                <div class="how-step">02</div>
+                <div class="how-icon-wrapper">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <h3>Share Your Goals</h3>
+                <p>Outline your targeted career fields, current certifications, professional communication level, and preferred companies.</p>
+                <div class="how-tags">
+                    <span class="how-tag">Career Interest</span>
+                    <span class="how-tag">Dream Companies</span>
+                    <span class="how-tag">Salary</span>
+                </div>
+            </div>
+            <div class="how-card">
+                <div class="how-step">03</div>
+                <div class="how-icon-wrapper">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <h3>Get Your Career GPS</h3>
+                <p>Instantly access a complete semester-wise learning timeline, skill gap analysis, course catalog, and interview strategy planner.</p>
+                <div class="how-tags">
+                    <span class="how-tag">8-Sem Timeline</span>
+                    <span class="how-tag">Eligibility Checker</span>
+                    <span class="how-tag">PDF Export</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Multi-Step Glassmorphic Form Section -->
+    <section class="survey-section" id="survey-form">
+        <div class="survey-container">
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="form-progress"></div>
+            </div>
+
+            <form id="career-form" onsubmit="event.preventDefault();">
+                <!-- STEP 1: Academic & Skills -->
+                <div class="form-step active" id="step-1">
+                    <h3>Academic Profile</h3>
+                    <p class="step-desc">Help us understand where you stand academically and technically.</p>
+                    
+                    <div class="form-group">
+                        <label>Engineering Branch</label>
+                        <div class="option-grid" id="branch-grid">
+                            <div class="option-card" data-value="Computer Science">
+                                <i class="fa-solid fa-laptop-code"></i> Computer Science
+                            </div>
+                            <div class="option-card" data-value="IT">
+                                <i class="fa-solid fa-network-wired"></i> IT
+                            </div>
+                            <div class="option-card" data-value="ECE">
+                                <i class="fa-solid fa-microchip"></i> ECE
+                            </div>
+                            <div class="option-card" data-value="EEE">
+                                <i class="fa-solid fa-bolt"></i> EEE
+                            </div>
+                            <div class="option-card" data-value="Mechanical">
+                                <i class="fa-solid fa-gears"></i> Mechanical
+                            </div>
+                            <div class="option-card" data-value="Civil">
+                                <i class="fa-solid fa-trowel-bricks"></i> Civil
+                            </div>
+                        </div>
+                        <input type="hidden" id="input-branch" name="branch" required>
+                        <div class="error-message" id="error-branch"><i class="fa-solid fa-circle-exclamation"></i> Please select a branch</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Current CGPA</label>
+                        <div class="slider-wrapper">
+                            <input type="range" id="input-cgpa" name="cgpa" min="0" max="10" step="0.1" value="7.5" oninput="updateCGPADisplay(this.value)">
+                            <div class="slider-value" id="cgpa-display">7.5</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Your Core Skills (Multi-select)</label>
+                        <div class="chips-container" id="skills-container">
+                            <span class="chip" data-skill="Python">Python</span>
+                            <span class="chip" data-skill="Java">Java</span>
+                            <span class="chip" data-skill="C++">C++</span>
+                            <span class="chip" data-skill="JavaScript">JavaScript</span>
+                            <span class="chip" data-skill="DSA">DSA</span>
+                            <span class="chip" data-skill="Web Development">Web Development</span>
+                            <span class="chip" data-skill="Machine Learning">Machine Learning</span>
+                            <span class="chip" data-skill="AI">AI</span>
+                            <span class="chip" data-skill="Cloud">Cloud</span>
+                            <span class="chip" data-skill="IoT">IoT</span>
+                            <span class="chip" data-skill="Embedded Systems">Embedded Systems</span>
+                            <span class="chip" data-skill="Cyber Security">Cyber Security</span>
+                            <span class="chip" data-skill="SQL">SQL</span>
+                        </div>
+                        <input type="hidden" id="input-skills" name="skills">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-projects">Core Projects Completed</label>
+                        <select class="select-field" id="input-projects" name="projects">
+                            <option value="0">0 Projects</option>
+                            <option value="1">1 Project</option>
+                            <option value="2">2 Projects</option>
+                            <option value="3">3 Projects</option>
+                            <option value="4+">4+ Projects</option>
+                        </select>
+                    </div>
+
+                    <div class="form-nav-buttons">
+                        <div></div> <!-- empty placeholder for layout -->
+                        <button type="button" class="btn-form-next" onclick="nextStep(2)">
+                            Next Step <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Career Targets & Profiles -->
+                <div class="form-step" id="step-2">
+                    <h3>Career Outlook</h3>
+                    <p class="step-desc">Tell us where you want to focus your engineering efforts.</p>
+
+                    <div class="form-group">
+                        <label>Preferred Career Path</label>
+                        <select class="select-field" id="input-career" name="career" required>
+                            <option value="" disabled selected>Select career interest...</option>
+                            <option value="Software Engineer">Software Engineer</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="AI Engineer">AI Engineer</option>
+                            <option value="Cloud Engineer">Cloud Engineer</option>
+                            <option value="DevOps">DevOps Engineer</option>
+                            <option value="Embedded Engineer">Embedded Systems Engineer</option>
+                            <option value="Research">Academic Research</option>
+                            <option value="Higher Studies">Higher Studies (M.Tech/MS/MBA)</option>
+                            <option value="Government Jobs">Government Jobs (GATE/PSUs/Civil)</option>
+                            <option value="Entrepreneurship">Entrepreneurship / Startup Founder</option>
+                        </select>
+                        <div class="error-message" id="error-career"><i class="fa-solid fa-circle-exclamation"></i> Please select a career path</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-certs">Earned Certifications (Comma separated)</label>
+                        <input type="text" class="text-field" id="input-certs" name="certs" placeholder="AWS Cloud Practitioner, GCP, Cisco CCNA, Oracle Java, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Professional Communication Level</label>
+                        <div class="option-grid" id="comm-grid">
+                            <div class="option-card" data-value="Beginner">
+                                <i class="fa-solid fa-comment-dots"></i> Beginner
+                            </div>
+                            <div class="option-card" data-value="Intermediate">
+                                <i class="fa-solid fa-comments"></i> Intermediate
+                            </div>
+                            <div class="option-card" data-value="Advanced">
+                                <i class="fa-solid fa-comments-dollar"></i> Advanced
+                            </div>
+                        </div>
+                        <input type="hidden" id="input-comm" name="communication" required>
+                        <div class="error-message" id="error-comm"><i class="fa-solid fa-circle-exclamation"></i> Please select your communication level</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Profiles Links</label>
+                        <div class="input-icon-wrapper" style="margin-bottom: 1rem;">
+                            <i class="fa-brands fa-github"></i>
+                            <input type="url" class="text-field" id="input-github" name="github" placeholder="GitHub URL (https://github.com/...)">
+                        </div>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-brands fa-linkedin"></i>
+                            <input type="url" class="text-field" id="input-linkedin" name="linkedin" placeholder="LinkedIn URL (https://linkedin.com/in/...)">
+                        </div>
+                    </div>
+
+                    <div class="form-nav-buttons">
+                        <button type="button" class="btn-form-prev" onclick="prevStep(1)">
+                            <i class="fa-solid fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn-form-next" onclick="nextStep(3)">
+                            Next Step <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Goals & Triggers -->
+                <div class="form-step" id="step-3">
+                    <h3>Target Goals</h3>
+                    <p class="step-desc">Establish your placement goals and ideal work style.</p>
+
+                    <div class="form-group">
+                        <label>Target Dream Companies (Select all that apply)</label>
+                        <div class="chips-container" id="companies-container">
+                            <span class="chip" data-company="Google">Google</span>
+                            <span class="chip" data-company="Microsoft">Microsoft</span>
+                            <span class="chip" data-company="Amazon">Amazon</span>
+                            <span class="chip" data-company="Apple">Apple</span>
+                            <span class="chip" data-company="NVIDIA">NVIDIA</span>
+                            <span class="chip" data-company="Qualcomm">Qualcomm</span>
+                            <span class="chip" data-company="Tesla">Tesla</span>
+                            <span class="chip" data-company="TCS">TCS</span>
+                            <span class="chip" data-company="Infosys">Infosys</span>
+                        </div>
+                        <input type="hidden" id="input-companies" name="companies">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Salary Target (LPA / Annual Package)</label>
+                        <div class="slider-wrapper">
+                            <input type="range" id="input-salary" name="salary" min="3" max="50" step="1" value="12" oninput="updateSalaryDisplay(this.value)">
+                            <div class="slider-value" id="salary-display">12 LPA</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preferred Work Location</label>
+                        <div class="option-grid" id="location-grid">
+                            <div class="option-card" data-value="India">
+                                <i class="fa-solid fa-indian-rupee-sign"></i> India
+                            </div>
+                            <div class="option-card" data-value="Abroad">
+                                <i class="fa-solid fa-earth-americas"></i> Abroad
+                            </div>
+                            <div class="option-card" data-value="Remote">
+                                <i class="fa-solid fa-house-laptop"></i> Remote
+                            </div>
+                        </div>
+                        <input type="hidden" id="input-location" name="location" required>
+                        <div class="error-message" id="error-location"><i class="fa-solid fa-circle-exclamation"></i> Please select a target location</div>
+                    </div>
+
+                    <div class="form-nav-buttons">
+                        <button type="button" class="btn-form-prev" onclick="prevStep(2)">
+                            <i class="fa-solid fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn-form-submit" onclick="generateRoadmap()">
+                            Generate Roadmap <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Loading Overlay with Scanner animation -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-scanner">
+            <div class="loading-scanner-bar"></div>
+            <i class="fa-solid fa-compass-drafting loading-icon"></i>
+        </div>
+        <div class="loading-status" id="loading-status">Analyzing Profile Data...</div>
+        <div class="loading-substatus" id="loading-substatus">Calculating career vectors and placement algorithms</div>
+    </div>
+
+    <!-- Career Roadmap Dashboard Section -->
+    <section class="dashboard-section" id="dashboard">
+        <div class="dashboard-header">
+            <div class="dashboard-title-area">
+                <h2 id="db-career-title">🎯 Career GPS Roadmap</h2>
+                <div class="dashboard-badge" id="db-profile-badge">
+                    <i class="fa-solid fa-graduation-cap"></i> CSE → Software Engineer
+                </div>
+            </div>
+            <div class="dashboard-controls">
+                <button class="btn-control" onclick="editInputs()">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+                </button>
+                <button class="btn-control" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+                <button class="btn-control btn-control-accent" onclick="saveToDevice()">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Roadmap
+                </button>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-panel">
+                <div class="metric-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="metric-details">
+                    <h4>Match Rating</h4>
+                    <p id="db-match-score">0%</p>
+                </div>
+            </div>
+            <div class="metric-panel">
+                <div class="metric-icon-box"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                <div class="metric-details">
+                    <h4>Predicted Package</h4>
+                    <p id="db-predicted-package">0 LPA</p>
+                </div>
+            </div>
+            <div class="metric-panel">
+                <div class="metric-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="metric-details">
+                    <h4>Placement Readiness</h4>
+                    <p id="db-readiness-val">0%</p>
+                </div>
+            </div>
+            <div class="metric-panel">
+                <div class="metric-icon-box"><i class="fa-solid fa-industry"></i></div>
+                <div class="metric-details">
+                    <h4>Eligible Companies</h4>
+                    <p id="db-eligible-companies-count">0 / 6</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Analysis Layout -->
+        <div class="analysis-layout">
+            <!-- Left: Match Scores (Circular charts) -->
+            <div class="analysis-box">
+                <h3><i class="fa-solid fa-circle-nodes"></i> Industry Match Analysis</h3>
+                <div class="scores-list" id="db-scores-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Right: Skill Gap Analysis -->
+            <div class="analysis-box">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Skills Gap Analysis</h3>
+                <div class="skill-gap-list" id="db-skill-gap-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Semester Timeline -->
+        <div class="timeline-section">
+            <h3 class="timeline-title"><i class="fa-solid fa-calendar-days"></i> Semester-wise Milestones</h3>
+            <div class="timeline-container" id="db-timeline-container">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Dynamic Recommended Courses -->
+        <div class="courses-section">
+            <h3 class="timeline-title" style="margin-bottom: 2rem;"><i class="fa-solid fa-circle-play"></i> Custom Learning Paths</h3>
+            <div class="courses-grid" id="db-courses-grid">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Bottom Grid: Placement checklist & Eligibility -->
+        <div class="bottom-sections-grid">
+            <!-- Placement Checklist -->
+            <div class="bottom-box">
+                <h3><i class="fa-solid fa-list-check"></i> Placement Preparation</h3>
+                <div class="readiness-progress-wrapper">
+                    <div class="readiness-header">
+                        <span>Overall Prep Score</span>
+                        <span id="readiness-pct-text">50%</span>
+                    </div>
+                    <div class="readiness-bar-container">
+                        <div class="readiness-bar-fill" id="readiness-bar"></div>
+                    </div>
+                </div>
+                <div class="placement-checklist" id="placement-checklist">
+                    <label class="checklist-item">
+                        <input type="checkbox" checked onchange="updateReadinessScore()">
+                        <div class="checklist-info">
+                            <h5>Aptitude & Logical Reasoning</h5>
+                            <p>RS Aggarwal chapters, quantitative problem solving, and mock timings.</p>
+                        </div>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" onchange="updateReadinessScore()">
+                        <div class="checklist-info">
+                            <h5>Core DSA Revision</h5>
+                            <p>Top 150 LeetCode problems (Array, Strings, LinkedList, Tree, Graphs).</p>
+                        </div>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" onchange="updateReadinessScore()">
+                        <div class="checklist-info">
+                            <h5>System Design Foundations</h5>
+                            <p>High-Level Architecture, Low-Level OOP details, caching, databases.</p>
+                        </div>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" onchange="updateReadinessScore()">
+                        <div class="checklist-info">
+                            <h5>Core Engineering Portfolio</h5>
+                            <p>2 fully styled web apps / hardware designs hosted with GitHub links.</p>
+                        </div>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" onchange="updateReadinessScore()">
+                        <div class="checklist-info">
+                            <h5>Resume Customization</h5>
+                            <p>ATS-friendly formats focusing on clear impact metrics and technologies.</p>
+                        </div>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" onchange="updateReadinessScore()">
+                        <div class="checklist-info">
+                            <h5>Technical Mock Interviews</h5>
+                            <p>Behavioral mock sessions, peer practicing, Pramp, or interviewing.io.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Corporate Eligibility Checker -->
+            <div class="bottom-box">
+                <h3><i class="fa-solid fa-building-circle-check"></i> Target Company Eligibility</h3>
+                <div class="eligibility-grid" id="db-eligibility-grid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Internship Strategy Section -->
+        <div class="internship-section-box">
+            <h3><i class="fa-solid fa-briefcase"></i> Internship Strategy Guide</h3>
+            <div class="internship-grid">
+                <div class="internship-checklist-column">
+                    <h4>Preparation Checklist</h4>
+                    <div class="internship-list" id="db-internship-list">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.25rem;">Best Platforms to Apply</h4>
+                    <div class="internship-platforms">
+                        <a href="https://linkedin.com" target="_blank" class="platform-box">
+                            <div class="platform-title">
+                                <i class="fa-brands fa-linkedin"></i> LinkedIn
+                            </div>
+                            <span class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></span>
+                        </a>
+                        <a href="https://wellfound.com" target="_blank" class="platform-box">
+                            <div class="platform-title">
+                                <i class="fa-solid fa-rocket"></i> Wellfound (AngelList)
+                            </div>
+                            <span class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></span>
+                        </a>
+                        <a href="https://internshala.com" target="_blank" class="platform-box">
+                            <div class="platform-title">
+                                <i class="fa-solid fa-graduation-cap"></i> Internshala
+                            </div>
+                            <span class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></span>
+                        </a>
+                        <a href="https://naukri.com" target="_blank" class="platform-box">
+                            <div class="platform-title">
+                                <i class="fa-solid fa-briefcase"></i> Naukri.com
+                            </div>
+                            <span class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-header">
+            <h2>Success Stories</h2>
+            <p>Read how engineering students landed dream roles using roadmaps crafted by Career GPS.</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div>
+                    <div class="testimonial-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p>"The semester-wise milestones guided me exactly on when to start DSA and when to build Web Dev projects. I landed a software developer intern position at Microsoft in Sem 6!"</p>
+                </div>
+                <div class="testimonial-user">
+                    <div class="user-avatar">AS</div>
+                    <div class="user-info">
+                        <h5>Aarav Sharma</h5>
+                        <p>CSE Graduate → Microsoft</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div>
+                    <div class="testimonial-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p>"As an ECE student, I was confused whether to focus on core VLSI or coding. Career GPS mapped out an Embedded Systems roadmap that bridged hardware and software. Eligible for NVIDIA right away!"</p>
+                </div>
+                <div class="testimonial-user">
+                    <div class="user-avatar">RI</div>
+                    <div class="user-info">
+                        <h5>Riya Iyer</h5>
+                        <p>ECE Student → NVIDIA</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div>
+                    <div class="testimonial-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p>"Transitioning from Mechanical to DevOps seemed impossible. The skill gap tool showed exactly what Cloud & Linux certificates I needed. Average package predicted was 8 LPA, but I secured 12 LPA!"</p>
+                </div>
+                <div class="testimonial-user">
+                    <div class="user-avatar">KP</div>
+                    <div class="user-info">
+                        <h5>Kunal Patel</h5>
+                        <p>Mech Graduate → DevOps at AWS Partner</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-container">
+            <div class="footer-logo-area">
+                <a href="#hero" class="logo" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-compass-drafting"></i> Career GPS
+                </a>
+                <p>Empowering engineering students with custom curriculum paths, skills gap targeting, and company readiness checker tools.</p>
+                <div class="footer-social-icons">
+                    <a href="https://github.com" target="_blank"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://linkedin.com" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="https://twitter.com" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-column">
+                <h5>Product</h5>
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#survey-form">Build Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-column">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#">Careers Portal</a></li>
+                    <li><a href="#">FAQ Guide</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-column">
+                <h5>Legal</h5>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Career GPS. Helping engineering students navigate their futures.</p>
+            <p>Designed with <i class="fa-solid fa-heart" style="color: var(--error);"></i> by Antigravity</p>
+        </div>
+    </footer>
+
+    <!-- Core Scripting -->
+    <script>
+        /* ----------------------------------------------------
+           PARTICLE BACKGROUND ENGINE
+        ---------------------------------------------------- */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const mouse = { x: null, y: null, radius: 120 };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        class Particle {
+            constructor(x, y, speedX, speedY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.speedX = speedX;
+                this.speedY = speedY;
+                this.size = size;
+                this.color = color;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Border check
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+
+                // Mouse interaction
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < mouse.radius) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += 2;
+                    if (mouse.x > this.x && this.x > this.size * 10) this.x -= 2;
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 2;
+                    if (mouse.y > this.y && this.y > this.size * 10) this.y -= 2;
+                }
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const numParticles = Math.floor((canvas.width * canvas.height) / 14000);
+            for (let i = 0; i < numParticles; i++) {
+                let size = Math.random() * 2 + 1;
+                let x = Math.random() * (canvas.width - size * 2) + size;
+                let y = Math.random() * (canvas.height - size * 2) + size;
+                let speedX = (Math.random() - 0.5) * 0.4;
+                let speedY = (Math.random() - 0.5) * 0.4;
+                let color = 'rgba(79, 142, 247, ' + (Math.random() * 0.3 + 0.1) + ')';
+                particles.push(new Particle(x, y, speedX, speedY, size, color));
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        // Initialize particles
+        resizeCanvas();
+        animateParticles();
+
+        /* ----------------------------------------------------
+           MOUSE HOVER GLOW EFFECT (CARD LEVEL)
+        ---------------------------------------------------- */
+        document.querySelectorAll('.stat-card, .how-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        /* ----------------------------------------------------
+           NAVIGATION LINKS ACTIVE STATE ON SCROLL
+        ---------------------------------------------------- */
+        const sections = document.querySelectorAll('section, footer');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Responsive Hamburger menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinksMenu = document.getElementById('nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinksMenu.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-xmark');
+        });
+
+        navLinksMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinksMenu.classList.remove('active');
+                const icon = menuToggle.querySelector('i');
+                icon.classList.add('fa-bars');
+                icon.classList.remove('fa-xmark');
+            });
+        });
+
+        /* ----------------------------------------------------
+           NUMBER COUNTER ANIMATION FOR HERO STATS
+        ---------------------------------------------------- */
+        const numCounters = document.querySelectorAll('.stat-number');
+        const obsOptions = { threshold: 0.5, rootMargin: "0px" };
+
+        const counterObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = entry.target;
+                    const endValue = parseInt(target.getAttribute('data-target'));
+                    animateCount(target, endValue);
+                    observer.unobserve(target);
+                }
+            });
+        }, obsOptions);
+
+        numCounters.forEach(counter => counterObserver.observe(counter));
+
+        function animateCount(element, targetVal) {
+            let start = 0;
+            const duration = 2000;
+            const increment = targetVal / (duration / 16); // ~60fps
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= targetVal) {
+                    element.textContent = targetVal;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start);
+                }
+            }, 16);
+        }
+
+        function scrollToSurvey() {
+            document.getElementById('survey-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* ----------------------------------------------------
+           SURVEY FORM CONTROLS & INTERACTIVITY
+        ---------------------------------------------------- */
+        let currentStep = 1;
+        const totalSteps = 3;
+        const answersState = {
+            branch: '',
+            cgpa: 7.5,
+            skills: [],
+            projects: '0',
+            career: '',
+            certs: '',
+            communication: '',
+            github: '',
+            linkedin: '',
+            companies: [],
+            salary: 12,
+            location: ''
+        };
+
+        // Option selection grids (Branch, Comm, Location)
+        setupGridSelection('branch-grid', 'input-branch', 'error-branch');
+        setupGridSelection('comm-grid', 'input-comm', 'error-comm');
+        setupGridSelection('location-grid', 'input-location', 'error-location');
+
+        function setupGridSelection(gridId, hiddenInputId, errorId) {
+            const grid = document.getElementById(gridId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const cards = grid.querySelectorAll('.option-card');
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    cards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    const val = card.getAttribute('data-value');
+                    hiddenInput.value = val;
+                    answersState[hiddenInput.name] = val;
+                    if (errorId) document.getElementById(errorId).style.display = 'none';
+                });
+            });
+        }
+
+        // Skills Multiselect Chips
+        document.querySelectorAll('#skills-container .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('selected');
+                const skill = chip.getAttribute('data-skill');
+                const idx = answersState.skills.indexOf(skill);
+                if (idx > -1) {
+                    answersState.skills.splice(idx, 1);
+                } else {
+                    answersState.skills.push(skill);
+                }
+                document.getElementById('input-skills').value = JSON.stringify(answersState.skills);
+            });
+        });
+
+        // Companies Multiselect Chips
+        document.querySelectorAll('#companies-container .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('selected');
+                const company = chip.getAttribute('data-company');
+                const idx = answersState.companies.indexOf(company);
+                if (idx > -1) {
+                    answersState.companies.splice(idx, 1);
+                } else {
+                    answersState.companies.push(company);
+                }
+                document.getElementById('input-companies').value = JSON.stringify(answersState.companies);
+            });
+        });
+
+        function updateCGPADisplay(val) {
+            document.getElementById('cgpa-display').textContent = val;
+            answersState.cgpa = parseFloat(val);
+        }
+
+        function updateSalaryDisplay(val) {
+            document.getElementById('salary-display').textContent = val + ' LPA';
+            answersState.salary = parseInt(val);
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                if (!answersState.branch) {
+                    document.getElementById('error-branch').style.display = 'flex';
+                    return false;
+                }
+            } else if (step === 2) {
+                const careerSelect = document.getElementById('input-career');
+                if (!careerSelect.value) {
+                    document.getElementById('error-career').style.display = 'flex';
+                    return false;
+                }
+                answersState.career = careerSelect.value;
+                document.getElementById('error-career').style.display = 'none';
+
+                if (!answersState.communication) {
+                    document.getElementById('error-comm').style.display = 'flex';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function nextStep(step) {
+            if (!validateStep(currentStep)) return;
+            
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            // Update Progress bar
+            const pct = (currentStep / totalSteps) * 100;
+            document.getElementById('form-progress').style.width = `${pct}%`;
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            // Update Progress bar
+            const pct = (currentStep / totalSteps) * 100;
+            document.getElementById('form-progress').style.width = `${pct}%`;
+        }
+
+        /* ----------------------------------------------------
+           ROADMAP GENERATOR & CAREER INTELLIGENCE DATA
+        ---------------------------------------------------- */
+        // Career Paths details and dynamic templates
+        const careerData = {
+            'Software Engineer': {
+                coreSkills: ['DSA', 'Web Development', 'SQL', 'JavaScript', 'Python'],
+                courses: [
+                    { name: 'Data Structures and Algorithms Nanodegree', platform: 'Udacity', duration: '4 Months', difficulty: 'Intermediate', rating: 4.8 },
+                    { name: 'The Complete Web Developer in 2026', platform: 'Udemy', duration: '6 Weeks', difficulty: 'Beginner', rating: 4.7 },
+                    { name: 'Introduction to Computer Science (CS50)', platform: 'Harvard edX', duration: '12 Weeks', difficulty: 'Beginner', rating: 4.9 }
+                ],
+                timeline: {
+                    s1: { skills: 'C Programming, Unix Commands, basic markdown', projects: 'Simple terminal command suite', os: 'Set up Linux WSL, personal config', book: 'The Pragmatic Programmer' },
+                    s2: { skills: 'Java or C++, OOP Principles, Git/GitHub', projects: 'Design patterns demonstration library', os: 'First Open Source patch submission', book: 'Clean Code by Robert C. Martin' },
+                    s3: { skills: 'Core DSA (Trees, Graphs, HashTables), SQL, HTML/CSS', projects: 'School management DB system with web GUI', os: 'Contribute to freeCodeCamp repo', book: 'Introduction to Algorithms (CLRS)' },
+                    s4: { skills: 'JavaScript, Advanced DSA, Computer Networks', projects: 'Real-time WebSocket chat room server', os: 'Partake in Hacktoberfest', book: 'Designing Data-Intensive Applications' },
+                    s5: { skills: 'React/Vue frontend frameworks, Node.js REST API design', projects: 'Full-stack SaaS task management dashboard', os: 'Start corporate internship hunt', book: 'Site Reliability Engineering (SRE) Handbook' },
+                    s6: { skills: 'System Design basics, Docker containerization, cloud hosting', projects: 'Microservices base e-commerce backend', os: 'Secure tech summer internship', book: 'Designing Distributed Systems' },
+                    s7: { skills: 'CI/CD pipelines, advanced db optimization, caching (Redis)', projects: 'High load production ready dashboard', os: 'Run placement tests, review mock feedback', book: 'The Mythical Man-Month' },
+                    s8: { skills: 'Testing methodologies (Jest), final review', projects: 'Capstone scalable SaaS launch', os: 'Final full-time placement onboarding', book: 'Continuous Delivery by Jez Humble' }
+                },
+                internships: [
+                    'Optimize Resume with metrics matching ATS keywords',
+                    'Host projects on Vercel/GitHub Pages with functional URLs',
+                    'Practice 120+ coding questions on platforms like LeetCode',
+                    'Apply via LinkedIn Jobs, Wellfound and target cold outreach emails'
+                ]
+            },
+            'Data Scientist': {
+                coreSkills: ['Python', 'Machine Learning', 'SQL', 'Math/Stats', 'AI'],
+                courses: [
+                    { name: 'IBM Data Science Professional Certificate', platform: 'Coursera', duration: '6 Months', difficulty: 'Beginner', rating: 4.6 },
+                    { name: 'Machine Learning A-Z: Hands-On Python', platform: 'Udemy', duration: '8 Weeks', difficulty: 'Intermediate', rating: 4.8 },
+                    { name: 'Applied Statistical Modeling', platform: 'Coursera', duration: '4 Weeks', difficulty: 'Advanced', rating: 4.7 }
+                ],
+                timeline: {
+                    s1: { skills: 'Python foundations, linear algebra, calculus', projects: 'Data visualization using matplotlib & seaborn', os: 'Establish clean GitHub profile', book: 'Naked Statistics by Charles Wheelan' },
+                    s2: { skills: 'Pandas, NumPy, introductory SQL data querying', projects: 'Exploratory Data Analysis (EDA) on Kaggle dataset', os: 'Participate in beginner Kaggle comp', book: 'Python for Data Analysis' },
+                    s3: { skills: 'Probability & Statistics, classical Machine Learning models', projects: 'Predictive housing valuation model using Scikit-Learn', os: 'Submit a custom Kaggle notebook', book: 'An Introduction to Statistical Learning' },
+                    s4: { skills: 'Advanced SQL, Tableau/PowerBI reporting integrations', projects: 'Company sales pipeline interactive dashboard', os: 'Document analytical findings on Medium', book: 'Storytelling with Data' },
+                    s5: { skills: 'Deep Learning fundamentals, PyTorch/TensorFlow frameworks', projects: 'Image classification model or sentiment classifier', os: 'Apply for research internship roles', book: 'Deep Learning by Ian Goodfellow' },
+                    s6: { skills: 'Big Data frameworks (Spark, Hadoop), model deployment APIs', projects: 'ML pipeline hosted as FastAPI microservice', os: 'Summer Data Science internship placement', book: 'Designing Data-Intensive Applications' },
+                    s7: { skills: 'Feature engineering techniques, ML Ops pipelines (MLflow)', projects: 'Complete end-to-end retrainable predictive system', os: 'Revise statistics and SQL mock queries', book: 'Introducing MLOps' },
+                    s8: { skills: 'A/B Testing, business metric alignments', projects: 'Capstone business optimization predictive suite', os: 'Transition to full-time Data Scientist', book: 'Trustworthy Online Controlled Experiments' }
+                },
+                internships: [
+                    'Publish 2 detailed Kaggle notebooks demonstrating clean EDA',
+                    'Highlight strong statistical backing in portfolio case studies',
+                    'Build and deploy ML models with interactive streamlit wrappers',
+                    'Search for opportunities on specialized portals like Wellfound and LinkedIn'
+                ]
+            },
+            'AI Engineer': {
+                coreSkills: ['Python', 'AI', 'Machine Learning', 'Deep Learning', 'DSA'],
+                courses: [
+                    { name: 'Deep Learning Specialization by Andrew Ng', platform: 'Coursera', duration: '5 Months', difficulty: 'Advanced', rating: 4.9 },
+                    { name: 'Generative AI with Large Language Models', platform: 'Coursera / AWS', duration: '3 Weeks', difficulty: 'Intermediate', rating: 4.8 },
+                    { name: 'Natural Language Processing Specialization', platform: 'DeepLearning.AI', duration: '3 Months', difficulty: 'Advanced', rating: 4.7 }
+                ],
+                timeline: {
+                    s1: { skills: 'Python, Math for ML (Linear Algebra, calculus)', projects: 'Basic math matrix manipulation package', os: 'Share code scripts on GitHub', book: 'Mathematics for Machine Learning' },
+                    s2: { skills: 'Data preprocessing, regression, classification models', projects: 'Spam detector using natural language approaches', os: 'Contribute to huggingface community', book: 'Hands-On Machine Learning' },
+                    s3: { skills: 'Neural Network architectures, PyTorch, CNNs', projects: 'Image classification using custom neural nets', os: 'Post tutorial on CNN training details', book: 'Deep Learning with PyTorch' },
+                    s4: { skills: 'Sequence models, RNNs, LSTMs, Transformers', projects: 'Language translation prototype using seq2seq', os: 'Participate in AI hackathons', book: 'Speech and Language Processing' },
+                    s5: { skills: 'LLM fine-tuning, RAG (Retrieval-Augmented Generation), vector DBs', projects: 'SaaS document AI assistant using OpenAI/LangChain', os: 'Target AI startup internships', book: 'Generative AI with LangChain' },
+                    s6: { skills: 'AI model deployment (ONNX, TensorRT, Docker)', projects: 'AI model optimized and hosted on serverless API', os: 'Summer AI research/dev internship', book: 'Designing Machine Learning Systems' },
+                    s7: { skills: 'Reinforcement Learning, Advanced NLP/Vision concepts', projects: 'Multi-agent simulation or autonomous game bot', os: 'Compile portfolio of AI applications', book: 'Reinforcement Learning: An Introduction' },
+                    s8: { skills: 'Ethics in AI, model optimization/distillation techniques', projects: 'Capstone Edge-AI hardware/software system', os: 'Join enterprise AI engineering teams', book: 'Artificial Intelligence: A Modern Approach' }
+                },
+                internships: [
+                    'Showcase functional LLM/RAG projects on a live portfolio',
+                    'Host interactive model demos using Hugging Face Spaces',
+                    'Practice optimization questions and basic algorithm checks',
+                    'Target technical roles via Y Combinator (YC) Work at a Startup'
+                ]
+            },
+            'Cloud Engineer': {
+                coreSkills: ['Cloud', 'Cyber Security', 'SQL', 'JavaScript', 'Python'],
+                courses: [
+                    { name: 'AWS Certified Solutions Architect Associate', platform: 'AWS Training', duration: '2 Months', difficulty: 'Intermediate', rating: 4.8 },
+                    { name: 'Google Associate Cloud Engineer Course', platform: 'Coursera', duration: '6 Weeks', difficulty: 'Intermediate', rating: 4.7 },
+                    { name: 'Cloud Computing Specialization', platform: 'Illinois Coursera', duration: '4 Months', difficulty: 'Advanced', rating: 4.6 }
+                ],
+                timeline: {
+                    s1: { skills: 'Linux OS command line, Networking foundations', projects: 'Configure secure local home server setup', os: 'Set up GitHub and learn Git workflow', book: 'The Practice of System and Network Administration' },
+                    s2: { skills: 'Python scripting, Virtualization, VM setup', projects: 'Automated server backup script utility', os: 'Contribute shell script helpers to repos', book: 'Linux Command Line and Shell Scripting' },
+                    s3: { skills: 'Introduction to AWS/GCP, SQL database configurations', projects: 'Host multi-tier website in public cloud subnets', os: 'Obtain AWS Cloud Practitioner cert', book: 'AWS Solutions Architect Study Guide' },
+                    s4: { skills: 'Infrastructure as Code (Terraform), Docker fundamentals', projects: 'Terraform script deploying load balanced VMs', os: 'Share Terraform templates on GitHub', book: 'Terraform: Up & Running' },
+                    s5: { skills: 'Kubernetes, Cloud networking (VPC, Peering, VPN)', projects: 'Containerized app cluster managed on EKS/GKE', os: 'Apply for DevOps/Cloud internships', book: 'Cloud Native Infrastructure' },
+                    s6: { skills: 'Serverless architectures (Lambda/Cloud Functions), IAM policies', projects: 'Event-driven image processing serverless tool', os: 'Secure Cloud Engineer internship', book: 'Architecting for the Cloud' },
+                    s7: { skills: 'Cloud Security compliance, monitoring tools (Prometheus)', projects: 'Highly secure, monitored cloud dashboard setup', os: 'Study architecture patterns and system checks', book: 'Google Cloud Certified Associate study' },
+                    s8: { skills: 'Hybrid cloud architectures, Cost optimization frameworks', projects: 'Capstone corporate disaster recovery system', os: 'Land role as Cloud Solutions Associate', book: 'Cloud Architecture Patterns' }
+                },
+                internships: [
+                    'Obtain at least 1 industry recognized cloud certification (AWS/GCP)',
+                    'Publish Infrastructure as Code (IaC) templates on GitHub',
+                    'Practice network security and basic subnetting configurations',
+                    'Apply via specialized tech consultancies and remote portals'
+                ]
+            },
+            'DevOps': {
+                coreSkills: ['Cloud', 'Python', 'SQL', 'Cyber Security', 'DSA'],
+                courses: [
+                    { name: 'DevOps Pre-Requisite Course', platform: 'KodeKloud', duration: '4 Weeks', difficulty: 'Beginner', rating: 4.8 },
+                    { name: 'Docker and Kubernetes: The Complete Guide', platform: 'Udemy', duration: '6 Weeks', difficulty: 'Intermediate', rating: 4.9 },
+                    { name: 'CI/CD Pipelines with Jenkins & GitHub Actions', platform: 'Udemy', duration: '5 Weeks', difficulty: 'Intermediate', rating: 4.7 }
+                ],
+                timeline: {
+                    s1: { skills: 'Bash Shell scripting, Linux system settings', projects: 'System diagnostic and report auto-mailer tool', os: 'Create dotfiles repo and customize WSL', book: 'The Phoenix Project' },
+                    s2: { skills: 'Python scripting, Git, networking essentials', projects: 'Git hook that lint checks codebase automatically', os: 'Contribute configurations to open source', book: 'Linux System Programming' },
+                    s3: { skills: 'Docker containerization, basic SQL & NoSQL setups', projects: 'Multi-container web app hosted on docker-compose', os: 'Help open source repos containerize apps', book: 'Using Docker by Adrian Mouat' },
+                    s4: { skills: 'CI/CD foundations (GitHub Actions/Jenkins), Linux security', projects: 'Auto-testing pipeline for JS/Python libraries', os: 'Integrate automated testing to projects', book: 'Jenkins 2: Up and Running' },
+                    s5: { skills: 'Kubernetes orchestration, Terraform IaC basics', projects: 'Declarative cluster deployment setup with monitoring', os: 'Join DevOps online forums, find internships', book: 'Kubernetes Up & Running' },
+                    s6: { skills: 'Ansible/Chef configuration, Prometheus & Grafana setup', projects: 'Self-healing web application deployment node', os: 'Work as DevOps intern during summer', book: 'Site Reliability Engineering' },
+                    s7: { skills: 'Logging aggregates (ELK Stack), cloud cost tools', projects: 'Production grade infrastructure telemetry system', os: 'Practice cloud security mock queries', book: 'The DevOps Handbook' },
+                    s8: { skills: 'DevSecOps integration, final capstone launch', projects: 'Zero-downtime rolling update deployment scheme', os: 'Join SaaS/Tech giants as DevOps Specialist', book: 'Continuous Delivery' }
+                },
+                internships: [
+                    'Publish automated CI/CD pipeline code on GitHub',
+                    'Demonstrate understanding of container orchestration (Kubernetes)',
+                    'Write architectural reports on disaster recovery scenarios',
+                    'Search for Cloud and Platform engineer postings on LinkedIn/Indeed'
+                ]
+            },
+            'Embedded Engineer': {
+                coreSkills: ['C++', 'Embedded Systems', 'IoT', 'Python', 'DSA'],
+                courses: [
+                    { name: 'Embedded Systems Shape The World', platform: 'edX UT Austin', duration: '4 Months', difficulty: 'Intermediate', rating: 4.9 },
+                    { name: 'Introduction to Microprocessors', platform: 'NPTEL', duration: '12 Weeks', difficulty: 'Beginner', rating: 4.6 },
+                    { name: 'Real-Time Embedded Systems Specialization', platform: 'Coursera CU Boulder', duration: '3 Months', difficulty: 'Advanced', rating: 4.8 }
+                ],
+                timeline: {
+                    s1: { skills: 'C Programming, Basic Circuit Analysis', projects: 'Simple logic gate simulator in C', os: 'Analyze basic electronic boards', book: 'The C Programming Language' },
+                    s2: { skills: 'Microcontrollers (Arduino, 8051), Digital Logic', projects: 'Automated home security sensor alarm', os: 'Build small hardware circuits', book: 'Practical Electronics for Inventors' },
+                    s3: { skills: 'C++, Assembly language, Embedded C, Oscilloscopes', projects: 'Digital clock utilizing custom timers on micro', os: 'Share firmware codes on GitHub', book: 'Programming Embedded Systems in C and C++' },
+                    s4: { skills: 'Sensors integration, UART/SPI/I2C communication protocols', projects: 'Multi-device sensor reader sending data over SPI', os: 'Build custom IoT device on breadboard', book: 'Making Embedded Systems' },
+                    s5: { skills: 'RTOS (Real-Time Operating Systems), FreeRTOS basics, PCB design', projects: 'Smart Agriculture monitoring using FreeRTOS tasks', os: 'Submit custom PCB layouts to KiCad forums', book: 'Real-Time Concepts for Embedded Systems' },
+                    s6: { skills: 'ARM Cortex architectures, IoT protocols (MQTT, HTTP)', projects: 'Industrial internet gateway prototype on ESP32', os: 'Secure Embedded Engineer hardware intern', book: 'Embedded Systems Architecture' },
+                    s7: { skills: 'Device Drivers, Embedded Linux kernel compiling', projects: 'Custom driver for sensor interfaced with Linux board', os: 'Practice hardware debug concepts', book: 'Linux Device Drivers' },
+                    s8: { skills: 'FPGA programming, Verilog/VHDL, hardware debugging', projects: 'UART transceiver architecture on FPGA core', os: 'Join semiconductor or automotive companies', book: 'Digital Design and Computer Architecture' }
+                },
+                internships: [
+                    'Upload clean, well-commented C/C++ firmware to GitHub',
+                    'Publish KiCad PCB design layouts and schematics in portfolio',
+                    'Practice hardware debugging questions and oscilloscope usage',
+                    'Target semiconductor companies (Qualcomm, Intel) and IoT startups'
+                ]
+            },
+            'Research': {
+                coreSkills: ['Python', 'Mathematical Modeling', 'AI', 'SQL'],
+                courses: [
+                    { name: 'Research Methodology and Writing', platform: 'NPTEL', duration: '8 Weeks', difficulty: 'Beginner', rating: 4.8 },
+                    { name: 'Mathematical Methods for Science', platform: 'Coursera', duration: '10 Weeks', difficulty: 'Intermediate', rating: 4.7 },
+                    { name: 'Introduction to Latex and Technical Writing', platform: 'Udemy', duration: '3 Weeks', difficulty: 'Beginner', rating: 4.6 }
+                ],
+                timeline: {
+                    s1: { skills: 'Literature Survey basics, Latex, Google Scholar usage', projects: 'Write a comprehensive 5-page literature survey on a chosen field', os: 'Set up profiles on ORCID and ResearchGate', book: 'How to Write and Publish a Scientific Paper' },
+                    s2: { skills: 'Research Methodology, Python data tools (Matplotlib, NumPy)', projects: 'Formulate a novel hypothesis and design a testing framework', os: 'Analyze 3 high-impact journal papers in detail', book: 'Mathematical Methods for Physics and Engineering' },
+                    s3: { skills: 'Advanced Mathematics, R programming or MATLAB', projects: 'Run statistical simulations on public datasets', os: 'Contribute data analysis scripts to open-source journals', book: 'All of Statistics by Larry Wasserman' },
+                    s4: { skills: 'Scientific Writing, reference managers (Mendeley/Zotero)', projects: 'Draft a short technical conference paper template', os: 'Present a poster at a regional engineering college symposium', book: 'The Craft of Scientific Writing' },
+                    s5: { skills: 'Data analysis pipelines, specialized field theory', projects: 'Simulate key benchmarks of an existing IEEE paper', os: 'Apply for Indian Academy of Sciences Summer Research Fellowship', book: 'Scientific Method in Practice' },
+                    s6: { skills: 'Thesis structure design, advanced modeling tools', projects: 'Design a prototype system or write code supporting research claims', os: 'Submit paper draft to a peer-reviewed national conference', book: 'Writing Your Dissertation in Fifteen Minutes a Day' },
+                    s7: { skills: 'Review response writing, academic presentation', projects: 'Complete draft of final undergraduate research project', os: 'Revise draft for international journal submission (IEEE/Springer)', book: 'The Elements of Style by Strunk & White' },
+                    s8: { skills: 'PhD / Masters proposal writing, final defense', projects: 'Publish the final capstone thesis document', os: 'Apply to top-tier research fellowships or graduate assistantships', book: 'A PhD Is Not Enough!' }
+                },
+                internships: [
+                    'Maintain a 8.5+ CGPA to satisfy top-tier graduate programs',
+                    'Draft a research proposal defining a specific technical problem',
+                    'Identify 3 target professors in your college or online for co-authorship',
+                    'Search for research fellowships at IISc, IITs, or international labs'
+                ]
+            },
+            'Higher Studies': {
+                coreSkills: ['DSA', 'Python', 'Java', 'SQL'],
+                courses: [
+                    { name: 'GRE Complete Preparation Masterclass', platform: 'Udemy', duration: '12 Weeks', difficulty: 'Beginner', rating: 4.8 },
+                    { name: 'GATE Computer Science Core Subjects', platform: 'Unacademy', duration: '6 Months', difficulty: 'Advanced', rating: 4.9 },
+                    { name: 'Mastering English & Verbal Reasoning', platform: 'Coursera', duration: '5 Weeks', difficulty: 'Beginner', rating: 4.7 }
+                ],
+                timeline: {
+                    s1: { skills: 'Aptitude, logical reasoning, verbal ability basics', projects: 'Design a self-monitoring mock test performance tracker app', os: 'Map out syllabus for target exam (GATE / GRE / CAT)', book: 'Word Power Made Easy by Norman Lewis' },
+                    s2: { skills: 'Core branch foundations (Discrete Maths / Circuits / Mechanics)', projects: 'Solve and catalog previous 5 years basic technical questions', os: 'Review academic grading and aim for 8.0+ CGPA', book: 'Official GRE Quantitative Reasoning' },
+                    s3: { skills: 'Advanced core topics, technical formulas', projects: 'Create visual summary maps of core semesters subjects', os: 'Join online study communities on Reddit / Discord', book: 'GATE Core Engineering Series' },
+                    s4: { skills: 'Practice mock exams, time management strategies', projects: 'Build a custom vocabulary card application in Python', os: 'Take diagnostic baseline exam to identify weak zones', book: 'Barron\'s Essential Words for the GRE' },
+                    s5: { skills: 'Analytical writing, essay drafting, advanced problems', projects: 'Draft Statement of Purpose (SOP) and resume outlines', os: 'Shortlist 10 target universities (Ambitious, Moderate, Safe)', book: 'Graduate Admissions Essays' },
+                    s6: { skills: 'Full-length mock exam papers, performance review', projects: 'Formulate undergraduate final thesis topic aligned with higher degree', os: 'Register and write actual GRE / TOEFL / GATE exams', book: 'Official Guide to the TOEFL Test' },
+                    s7: { skills: 'University application portals, visa prep, finance checks', projects: 'Finalize LORs from professors and industrial leads', os: 'Submit applications to target institutions', book: 'The Graduate School Funding Handbook' },
+                    s8: { skills: 'Interview prep, pre-departure checklists', projects: 'Graduate Capstone project defense', os: 'Secure financial aid, visa stamp, and travel booking', book: 'MS & MBA Prep Guides' }
+                },
+                internships: [
+                    'Maintain high academic grades (CGPA is highly weighted)',
+                    'Secure at least 3 strong Letter of Recommendations from faculty',
+                    'Prepare an impactful Statement of Purpose outlining future research goals',
+                    'Apply for summer internships that have high academic and project weightage'
+                ]
+            },
+            'Government Jobs': {
+                coreSkills: ['DSA', 'SQL', 'Python'],
+                courses: [
+                    { name: 'General Studies and Current Affairs Boot Camp', platform: 'NPTEL', duration: '12 Weeks', difficulty: 'Beginner', rating: 4.6 },
+                    { name: 'Quantitative Aptitude for Competitive Exams', platform: 'Udemy', duration: '8 Weeks', difficulty: 'Beginner', rating: 4.8 },
+                    { name: 'GATE / PSU Exam Technical Questions Revision', platform: 'Made Easy', duration: '5 Months', difficulty: 'Advanced', rating: 4.9 }
+                ],
+                timeline: {
+                    s1: { skills: 'Quantitative Aptitude, general logic, basic math calculations', projects: 'Aptitude calculator command line script', os: 'Review government exams timeline and criteria', book: 'Quantitative Aptitude by R.S. Aggarwal' },
+                    s2: { skills: 'Basic Current Affairs, national history, geographic facts', projects: 'Web scraper indexing daily news highlights', os: 'Purchase core standard textbooks for government syllabus', book: 'Manorama Yearbook' },
+                    s3: { skills: 'Core branch subjects (Circuits, Thermodynamics, OOPs)', projects: 'Formula cheat sheets compiler script', os: 'Aim for a minimum CGPA of 6.5 (PSU cutoff requirement)', book: 'Made Easy Hand Book of Engineering' },
+                    s4: { skills: 'Logical Reasoning, verbal comprehension skills', projects: 'Interactive MCQ flashcard program', os: 'Solve 10 past years questions of GATE / UPSC CSE', book: 'A Modern Approach to Verbal & Non-Verbal Reasoning' },
+                    s5: { skills: 'Advanced core engineering subjects revision', projects: 'Comprehensive summary reports of academic labs', os: 'Join a mock test series for competitive exams', book: 'GATE Previous Years Solved Papers' },
+                    s6: { skills: 'Mock tests, paper patterns analysis, time control tips', projects: 'Mini technical prototype relevant to PSU fields (e.g. power grid controller)', os: 'Apply for government trainee opportunities / DRDO summer training', book: 'Indian Polity by M. Laxmikanth' },
+                    s7: { skills: 'Interview prep, group discussions, general knowledge revision', projects: 'Draft resume for PSU technical interviews', os: 'Appear for main GATE or UPSC Engineering Services examinations', book: 'General Knowledge by Lucent' },
+                    s8: { skills: 'Physical fitness tests, final documentation check', projects: 'Capstone project submission and defense', os: 'Attend government board interviews and verify credentials', book: 'UPSC Board Interview Preparation guide' }
+                },
+                internships: [
+                    'Check public notifications at PSU sites like ONGC, IOCL, NTPC, DRDO',
+                    'Solve at least 20 full-length previous year papers under exam timing',
+                    'Maintain clean academic records with no backlogs',
+                    'Prepare for core board interview rounds focusing on technical concepts'
+                ]
+            },
+            'Entrepreneurship': {
+                coreSkills: ['Web Development', 'Python', 'Cloud', 'SQL', 'JavaScript'],
+                courses: [
+                    { name: 'How to Build a Startup by Steve Blank', platform: 'Udacity', duration: '4 Weeks', difficulty: 'Beginner', rating: 4.8 },
+                    { name: 'Startup School by Y Combinator', platform: 'Y Combinator', duration: '8 Weeks', difficulty: 'Beginner', rating: 4.9 },
+                    { name: 'Financial Literacy for Startup Founders', platform: 'Coursera', duration: '6 Weeks', difficulty: 'Intermediate', rating: 4.7 }
+                ],
+                timeline: {
+                    s1: { skills: 'Web foundations, problem identification, market study', projects: 'Simple landing page surveying user pain points', os: 'Map out 5 distinct startup ideas addressing tech gaps', book: 'The Lean Startup by Eric Ries' },
+                    s2: { skills: 'Python, basic Javascript, wireframing, Figma', projects: 'Interactive UX/UI prototype of the product idea', os: 'Conduct 20 customer interviews validating the problem', book: 'Zero to One by Peter Thiel' },
+                    s3: { skills: 'Full-stack development, database architecture (SQL)', projects: 'Functional Minimum Viable Product (MVP) base code', os: 'Share product concept on Product Hunt or Reddit forums', book: 'The Founder\'s Dilemmas' },
+                    s4: { skills: 'Cloud deployment, authentication, analytics tools', projects: 'Deployed MVP tracking basic visitor logs and interactions', os: 'Acquire first 100 beta test users', book: 'The Mom Test by Rob Fitzpatrick' },
+                    s5: { skills: 'Financial modeling, basic marketing (SEO, Ads), sales pitches', projects: 'Investor pitch deck and financial forecast sheets', os: 'Apply for college business incubator program', book: 'Venture Deals by Brad Feld' },
+                    s6: { skills: 'Scaling architectures, API integrations, legal frameworks', projects: 'Product beta launch with automated subscription payment gate', os: 'Participate in college startup pitch contests for grant money', book: 'High Growth Handbook' },
+                    s7: { skills: 'Growth hacking, cohort analysis, team hiring', projects: 'Multi-feature platform release with customer reviews', os: 'Pitch to angel investors or seed funds (e.g. YC, local angels)', book: 'Traction by Gabriel Weinberg' },
+                    s8: { skills: 'Corporate registration, team scaling, operations', projects: 'Launch of V1 product with recurring customer metrics', os: 'Formally register the company and begin hiring junior developers', book: 'Hard Thing About Hard Things' }
+                },
+                internships: [
+                    'Construct a functioning MVP and host it publicly',
+                    'Create a compelling 10-slide pitch deck covering market size and vision',
+                    'Participate in startup cohort programs (e.g., Y Combinator Startup School)',
+                    'Aim for incubators inside your college or regional state startup grants'
+                ]
+            }
+        };
+
+        function generateRoadmap() {
+            // Validate step 3 fields
+            if (!answersState.location) {
+                document.getElementById('error-location').style.display = 'flex';
+                return;
+            }
+            document.getElementById('error-location').style.display = 'none';
+
+            // Show Loading Screen
+            const loader = document.getElementById('loading-overlay');
+            const statusEl = document.getElementById('loading-status');
+            const substatusEl = document.getElementById('loading-substatus');
+            
+            loader.classList.add('active');
+
+            const loadingPhases = [
+                { status: "Analyzing Profile Data...", sub: "Processing branch, CGPA, and coding credentials" },
+                { status: "Calculating Career Vectors...", sub: "Mapping career path requirements against selected skills" },
+                { status: "Evaluating Target Companies...", sub: "Checking hiring criteria for Google, NVIDIA, TCS, etc." },
+                { status: "Generating Semester Milestones...", sub: "Synthesizing customized 8-semester roadmap timeline" }
+            ];
+
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < loadingPhases.length) {
+                    statusEl.textContent = loadingPhases[step].status;
+                    substatusEl.textContent = loadingPhases[step].sub;
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    loader.classList.remove('active');
+                    renderDashboardData();
+                    triggerConfetti();
+                }
+            }, 800);
+        }
+
+        function triggerConfetti() {
+            // Confetti explosion from canvas-confetti
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#4F8EF7', '#7C3AED', '#10B981', '#ffffff']
+            });
+        }
+
+        /* ----------------------------------------------------
+           DASHBOARD RENDERING ENGINE (DATA & CALCULATIONS)
+        ---------------------------------------------------- */
+        function renderDashboardData() {
+            // Scroll to top of dashboard once rendered
+            const db = document.getElementById('dashboard');
+            db.classList.add('active');
+            document.getElementById('survey-form').style.display = 'none';
+            db.scrollIntoView({ behavior: 'smooth' });
+
+            // Set Title & Badge
+            document.getElementById('db-career-title').innerHTML = `🎯 Career GPS: ${answersState.career}`;
+            document.getElementById('db-profile-badge').innerHTML = `<i class="fa-solid fa-graduation-cap"></i> ${answersState.branch} &rarr; ${answersState.career}`;
+
+            // 1. Calculate Match Score
+            const pathInfo = careerData[answersState.career] || { coreSkills: [], courses: [], timeline: {}, internships: [] };
+            const selectedSkills = answersState.skills;
+            const matchedSkills = pathInfo.coreSkills.filter(s => selectedSkills.includes(s));
+            
+            let matchScore = 20; // baseline
+            if (pathInfo.coreSkills.length > 0) {
+                matchScore = Math.floor((matchedSkills.length / pathInfo.coreSkills.length) * 80) + 20;
+            } else {
+                // Non-technical/generic fields calculate match score based on basic metrics (cgpa & communication)
+                matchScore = Math.floor((answersState.cgpa / 10) * 60) + 25;
+                if (answersState.communication === 'Advanced') matchScore += 15;
+                else if (answersState.communication === 'Intermediate') matchScore += 10;
+            }
+            if (answersState.cgpa > 8) matchScore += 5;
+            if (matchScore > 100) matchScore = 100;
+
+            document.getElementById('db-match-score').textContent = `${matchScore}%`;
+
+            // 2. Predict Salary Package
+            let baseSalary = 5.0; // default in LPA
+            if (answersState.career === 'Software Engineer') baseSalary = 7.0;
+            else if (answersState.career === 'AI Engineer') baseSalary = 9.5;
+            else if (answersState.career === 'Data Scientist') baseSalary = 8.5;
+            else if (answersState.career === 'Cloud Engineer' || answersState.career === 'DevOps') baseSalary = 7.5;
+            else if (answersState.career === 'Embedded Engineer') baseSalary = 6.8;
+            else if (answersState.career === 'Research') baseSalary = 5.5;
+            else if (answersState.career === 'Entrepreneurship') baseSalary = 12.0;
+            else if (answersState.career === 'Higher Studies') baseSalary = 8.0;
+            else if (answersState.career === 'Government Jobs') baseSalary = 6.5;
+
+            // Multipliers
+            let cgpaMult = 1.0;
+            if (answersState.cgpa >= 9.0) cgpaMult = 1.35;
+            else if (answersState.cgpa >= 8.0) cgpaMult = 1.15;
+            else if (answersState.cgpa < 6.5) cgpaMult = 0.85;
+
+            let projMult = 1.0;
+            if (answersState.projects === '2') projMult = 1.1;
+            else if (answersState.projects === '3') projMult = 1.2;
+            else if (answersState.projects === '4+') projMult = 1.3;
+
+            let commMult = 1.0;
+            if (answersState.communication === 'Intermediate') commMult = 1.1;
+            else if (answersState.communication === 'Advanced') commMult = 1.25;
+
+            const predAvg = (baseSalary * cgpaMult * projMult * commMult).toFixed(1);
+            const predBest = (predAvg * 1.5).toFixed(1);
+
+            document.getElementById('db-predicted-package').textContent = `${predAvg} LPA`;
+
+            // 3. Render Match Analysis Cards
+            const matchContainer = document.getElementById('db-scores-list');
+            matchContainer.innerHTML = '';
+            const testScores = [
+                { name: 'Software Engineering', score: answersState.career === 'Software Engineer' ? matchScore : Math.floor(Math.random()*30 + 50), icon: 'fa-laptop-code', fill: '#4F8EF7' },
+                { name: 'Data Science', score: answersState.career === 'Data Scientist' ? matchScore : Math.floor(Math.random()*30 + 45), icon: 'fa-chart-pie', fill: '#10B981' },
+                { name: 'Embedded Systems', score: answersState.career === 'Embedded Engineer' ? matchScore : Math.floor(Math.random()*30 + 35), icon: 'fa-microchip', fill: '#F59E0B' },
+                { name: 'Cloud Computing', score: (answersState.career === 'Cloud Engineer' || answersState.career === 'DevOps') ? matchScore : Math.floor(Math.random()*30 + 40), icon: 'fa-cloud', fill: '#7C3AED' }
+            ];
+
+            testScores.forEach(item => {
+                const dashOffset = 220 - (220 * item.score) / 100;
+                matchContainer.innerHTML += `
+                    <div class="score-item">
+                        <div class="circle-progress-wrapper">
+                            <svg class="circle-progress-svg">
+                                <circle class="circle-bg" cx="35" cy="35" r="30"></circle>
+                                <circle class="circle-fill" cx="35" cy="35" r="30" stroke="${item.fill}" style="stroke-dashoffset: ${dashOffset};"></circle>
+                            </svg>
+                            <span class="score-text">${item.score}%</span>
+                        </div>
+                        <div class="score-info">
+                            <h4>${item.name}</h4>
+                            <p>Industry Alignment</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 4. Render Skills Gap Analysis
+            const gapContainer = document.getElementById('db-skill-gap-list');
+            gapContainer.innerHTML = '';
+            
+            const targetSkills = pathInfo.coreSkills.length > 0 ? pathInfo.coreSkills : ['Python', 'DSA', 'SQL', 'Git'];
+            
+            targetSkills.forEach(skill => {
+                const acquired = selectedSkills.includes(skill);
+                const progressWidth = acquired ? 100 : 25;
+                const statusText = acquired ? 'Acquired' : 'Pending';
+                const statusClass = acquired ? 'gap-status-acquired' : 'gap-status-missing';
+                const color = acquired ? 'var(--success)' : 'var(--error)';
+                const recText = acquired ? 'Excellent command, keep updated.' : `Recommended Study: 4-6 weeks to reach intermediate depth.`;
+
+                gapContainer.innerHTML += `
+                    <div class="gap-item">
+                        <div class="gap-header">
+                            <span>${skill}</span>
+                            <span class="gap-status-label ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="gap-bar-container">
+                            <div class="gap-bar-fill" style="width: ${progressWidth}%; background-color: ${color}"></div>
+                        </div>
+                        <p class="gap-item-recommendation">
+                            <i class="fa-solid fa-circle-info"></i> ${recText}
+                        </p>
+                    </div>
+                `;
+            });
+
+            // 5. Render Semester Timeline
+            const timelineContainer = document.getElementById('db-timeline-container');
+            timelineContainer.innerHTML = '';
+
+            const branch = answersState.branch;
+            const career = answersState.career;
+
+            // Generate timeline semester-by-semester
+            for (let i = 1; i <= 8; i++) {
+                let semSkills = '';
+                let semProjects = '';
+                let semTarget = '';
+                let bookName = 'Introduction to Engineering';
+
+                const semKey = `s${i}`;
+                const targetTimeline = pathInfo.timeline[semKey] || { skills: 'General Engineering Studies', projects: 'Coursework assignment', os: 'Set up profiles', book: 'The Pragmatic Programmer' };
+                
+                semSkills = targetTimeline.skills;
+                semProjects = targetTimeline.projects;
+                semTarget = targetTimeline.os;
+
+                const booksDict = {
+                    1: 'The Pragmatic Programmer',
+                    2: 'Clean Code by Robert C. Martin',
+                    3: 'Introduction to Algorithms (CLRS)',
+                    4: 'Designing Data-Intensive Applications',
+                    5: 'Site Reliability Engineering (SRE) Handbook',
+                    6: 'Designing Distributed Systems',
+                    7: 'The Mythical Man-Month',
+                    8: 'Continuous Delivery by Jez Humble'
+                };
+                bookName = targetTimeline.book || booksDict[i] || 'The Pragmatic Programmer';
+
+                timelineContainer.innerHTML += `
+                    <div class="timeline-node">
+                        <div class="timeline-indicator"></div>
+                        <div class="timeline-card">
+                            <div class="timeline-header">
+                                <h4>Semester ${i}</h4>
+                                <span class="timeline-sem-badge">Year ${Math.ceil(i/2)}</span>
+                            </div>
+                            <div class="timeline-grid">
+                                <div class="timeline-grid-column">
+                                    <div class="timeline-detail-group">
+                                        <h5><i class="fa-solid fa-code"></i> Focus & Core Skills</h5>
+                                        <p>${semSkills}</p>
+                                    </div>
+                                    <div class="timeline-detail-group">
+                                        <h5><i class="fa-solid fa-lightbulb"></i> Target Semester Project</h5>
+                                        <p><strong>${semProjects}</strong></p>
+                                    </div>
+                                </div>
+                                <div class="timeline-grid-column">
+                                    <div class="timeline-detail-group">
+                                        <h5><i class="fa-solid fa-bullseye"></i> Open-Source & Preparation Goal</h5>
+                                        <p>${semTarget}</p>
+                                    </div>
+                                    <div class="timeline-detail-group">
+                                        <h5><i class="fa-solid fa-book"></i> Recommended Literature</h5>
+                                        <p style="font-style: italic; color: var(--text-secondary);"><i class="fa-solid fa-book-open"></i> "${bookName}"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 6. Recommended Courses Grid
+            const coursesContainer = document.getElementById('db-courses-grid');
+            coursesContainer.innerHTML = '';
+            
+            const courses = pathInfo.courses.length > 0 ? pathInfo.courses : [
+                { name: 'Introduction to Professional Coding', platform: 'Coursera', duration: '4 Weeks', difficulty: 'Beginner', rating: 4.7 },
+                { name: 'Core Engineering Mathematics and Models', platform: 'NPTEL', duration: '12 Weeks', difficulty: 'Intermediate', rating: 4.5 },
+                { name: 'Advanced Engineering Project Management', platform: 'Udemy', duration: '6 Weeks', difficulty: 'Advanced', rating: 4.6 }
+            ];
+
+            courses.forEach(c => {
+                coursesContainer.innerHTML += `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <span class="course-platform">${c.platform}</span>
+                            <span class="course-rating"><i class="fa-solid fa-star"></i> ${c.rating}</span>
+                        </div>
+                        <h4>${c.name}</h4>
+                        <div class="course-details">
+                            <span><i class="fa-regular fa-clock"></i> ${c.duration}</span>
+                            <span><i class="fa-solid fa-signal"></i> ${c.difficulty}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 7. Corporate Eligibility Checker
+            const eligContainer = document.getElementById('db-eligibility-grid');
+            eligContainer.innerHTML = '';
+
+            const companies = [
+                { name: 'Google', minCGPA: 8.5, requiredSkill: 'DSA', icon: 'fa-brands fa-google' },
+                { name: 'Microsoft', minCGPA: 8.0, requiredSkill: 'DSA', icon: 'fa-brands fa-windows' },
+                { name: 'Amazon', minCGPA: 7.5, requiredSkill: 'DSA', icon: 'fa-brands fa-amazon' },
+                { name: 'Qualcomm', minCGPA: 7.5, requiredSkill: 'Embedded Systems', icon: 'fa-solid fa-microchip' },
+                { name: 'NVIDIA', minCGPA: 8.5, requiredSkill: 'C++', icon: 'fa-solid fa-server' },
+                { name: 'TCS & Infosys', minCGPA: 6.0, requiredSkill: '', icon: 'fa-solid fa-laptop-code' }
+            ];
+
+            let eligibleCount = 0;
+            companies.forEach(company => {
+                let status = 'need-prep';
+                let statusText = 'Need Prep';
+                
+                const gpaCheck = answersState.cgpa >= company.minCGPA;
+                const skillCheck = !company.requiredSkill || selectedSkills.includes(company.requiredSkill);
+
+                if (gpaCheck && skillCheck) {
+                    status = 'eligible';
+                    statusText = 'Eligible';
+                    eligibleCount++;
+                } else if (gpaCheck || skillCheck) {
+                    status = 'almost';
+                    statusText = 'Almost Eligible';
+                }
+
+                eligContainer.innerHTML += `
+                    <div class="eligibility-item">
+                        <div class="eligibility-company">
+                            <i class="${company.icon}"></i>
+                            <h5>${company.name}</h5>
+                        </div>
+                        <span class="eligibility-badge-pill ${status}">${statusText}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('db-eligible-companies-count').textContent = `${eligibleCount} / 6`;
+
+            // 8. Internship Strategy Details
+            const internshipContainer = document.getElementById('db-internship-list');
+            internshipContainer.innerHTML = '';
+            
+            const strategies = pathInfo.internships.length > 0 ? pathInfo.internships : [
+                'Optimize your engineering CV using clear templates',
+                'Upload coding projects and lab documentations to GitHub',
+                'Practice interview questions focusing on fundamental math and engineering concepts',
+                'Apply to startup internships via AngelList / Wellfound'
+            ];
+
+            strategies.forEach(strategy => {
+                internshipContainer.innerHTML += `
+                    <div class="internship-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>${strategy}</span>
+                    </div>
+                `;
+            });
+
+            // Initialize readiness checkboxes
+            updateReadinessScore();
+        }
+
+        function updateReadinessScore() {
+            const list = document.getElementById('placement-checklist');
+            const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const pct = Math.floor((checkedCount / checkboxes.length) * 100);
+
+            document.getElementById('readiness-bar').style.width = `${pct}%`;
+            document.getElementById('readiness-pct-text').textContent = `${pct}%`;
+            document.getElementById('db-readiness-val').textContent = `${pct}%`;
+        }
+
+        function editInputs() {
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('survey-form').style.display = 'block';
+            document.getElementById('survey-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveToDevice() {
+            // Save state to Local Storage
+            localStorage.setItem('career-gps-answers', JSON.stringify(answersState));
+            alert('Roadmap configuration saved to your browser local storage successfully!');
+        }
+
+        // Check if cached profile exists
+        window.addEventListener('load', () => {
+            const cached = localStorage.getItem('career-gps-answers');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    // Prepopulate form if needed
+                } catch(e) {}
+            }
+        });
+    </script>
+</body>
+</html>
